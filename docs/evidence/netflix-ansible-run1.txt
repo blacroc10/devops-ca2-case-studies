@@ -1,0 +1,37 @@
+=== RUN 1 ===
+
+PLAY [Configure the Netflix playback runtime] **********************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [Install runtime packages] ************************************************
+changed: [localhost]
+
+TASK [Create service group] ****************************************************
+changed: [localhost]
+
+TASK [Create service user] *****************************************************
+changed: [localhost]
+
+TASK [Create application directories] ******************************************
+changed: [localhost] => (item={'path': '/opt/netflix/playback', 'mode': '0755'})
+changed: [localhost] => (item={'path': '/var/lib/netflix/playback', 'mode': '0750'})
+changed: [localhost] => (item={'path': '/var/log/netflix/playback', 'mode': '0750'})
+changed: [localhost] => (item={'path': '/etc/netflix/playback', 'mode': '0755'})
+
+TASK [Render service config] ***************************************************
+changed: [localhost]
+
+TASK [Copy playback application] ***********************************************
+changed: [localhost]
+
+TASK [Copy playback requirements] **********************************************
+changed: [localhost]
+
+RUNNING HANDLER [reload config] ************************************************
+changed: [localhost]
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=9    changed=8    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

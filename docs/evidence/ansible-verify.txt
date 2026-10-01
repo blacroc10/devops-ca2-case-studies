@@ -1,0 +1,18 @@
+=== VERIFY ===
+uid=999(catalogsvc) gid=1001(twopizza) groups=1001(twopizza)
+/etc/amazon/catalog:
+total 4
+-rw-r----- 1 catalogsvc twopizza 126 Oct  1 16:01 app.conf
+
+/opt/amazon/catalog:
+total 8
+-rw-r--r-- 1 catalogsvc twopizza 2183 Oct  1 16:01 app.py
+-rw-r--r-- 1 catalogsvc twopizza   56 Oct  1 16:01 requirements.txt
+---
+# Managed by Ansible. Do not edit on the host.
+service_name=catalog
+app_version=v1
+log_level=info
+app_dir=/opt/amazon/catalog
+---
+reloaded

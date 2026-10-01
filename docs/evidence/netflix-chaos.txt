@@ -1,0 +1,73 @@
+===== pods before =====
+NAME                               START                  LABELS    READY
+playback-785b677cbd-2kt69          2026-10-01T16:01:38Z   enabled   true
+playback-785b677cbd-vv8gx          2026-10-01T16:01:38Z   enabled   true
+playback-785b677cbd-wds5f          2026-10-01T16:01:38Z   enabled   true
+recommendations-85568d78f9-5r5ts   2026-10-01T16:01:38Z   enabled   true
+recommendations-85568d78f9-t8wcw   2026-10-01T16:01:38Z   enabled   true
+recommendations-85568d78f9-v26bn   2026-10-01T16:01:38Z   enabled   true
+===== chaos monkey dry-run =====
+selected pod netflix-demo/playback-785b677cbd-wds5f label chaos=enabled
+dry-run: no pod deleted. Pass --execute to delete.
+===== refuse other namespace =====
+refusing namespace 'amazon-demo'; only netflix-demo is allowed
+===== start playback load =====
+pod/chaos-load created
+pod/chaos-load condition met
+===== chaos monkey execute =====
+pod "playback-785b677cbd-2kt69" deleted from netflix-demo namespace
+selected pod netflix-demo/playback-785b677cbd-2kt69 label chaos=enabled
+deleted netflix-demo/playback-785b677cbd-2kt69
+===== delete recommendations pods to force the fallback =====
+pod "recommendations-85568d78f9-5r5ts" deleted from netflix-demo namespace
+pod "recommendations-85568d78f9-t8wcw" deleted from netflix-demo namespace
+pod "recommendations-85568d78f9-v26bn" deleted from netflix-demo namespace
+===== one playback call during the outage =====
+{"degraded":false,"recommendations":["The Night Agent","One Piece","Bridgerton","Wednesday"],"service":"playback","status":"playing","title":"House of Cards","version":"v1"}
+
+===== wait for self-heal =====
+deployment "playback" successfully rolled out
+deployment "recommendations" successfully rolled out
+===== pods after =====
+NAME                               START                  RESTARTS
+chaos-load                         2026-10-01T16:03:57Z   0
+playback-785b677cbd-vdr9r          2026-10-01T16:04:00Z   0
+playback-785b677cbd-vv8gx          2026-10-01T16:01:38Z   0
+playback-785b677cbd-wds5f          2026-10-01T16:01:38Z   0
+recommendations-85568d78f9-8p7tj   2026-10-01T16:04:03Z   0
+recommendations-85568d78f9-bvr9v   2026-10-01T16:04:03Z   0
+recommendations-85568d78f9-tml6m   2026-10-01T16:04:03Z   0
+===== playback after recovery =====
+{"degraded":false,"recommendations":["The Night Agent","One Piece","Bridgerton","Wednesday"],"service":"playback","status":"playing","title":"House of Cards","version":"v1"}
+
+===== load result =====
+ok=897 fail=0 degraded=12
+===== capture a degraded playback response =====
+pod "recommendations-85568d78f9-8p7tj" deleted from netflix-demo namespace
+pod "recommendations-85568d78f9-bvr9v" deleted from netflix-demo namespace
+pod "recommendations-85568d78f9-tml6m" deleted from netflix-demo namespace
+recommendations_unreachable=True
+{"degraded":false,"recommendations":["The Night Agent","One Piece","Bridgerton","Wednesday"],"service":"playback","status":"playing","title":"House of Cards","version":"v1"}
+
+Waiting for deployment "recommendations" rollout to finish: 0 of 3 updated replicas are available...
+Waiting for deployment "recommendations" rollout to finish: 0 of 3 updated replicas are available...
+Waiting for deployment "recommendations" rollout to finish: 0 of 3 updated replicas are available...
+Waiting for deployment "recommendations" rollout to finish: 0 of 3 updated replicas are available...
+Waiting for deployment "recommendations" rollout to finish: 1 of 3 updated replicas are available...
+Waiting for deployment "recommendations" rollout to finish: 2 of 3 updated replicas are available...
+deployment "recommendations" successfully rolled out
+===== scale recommendations to 0 and read /play =====
+deployment.apps/recommendations scaled
+pod/recommendations-85568d78f9-f4fj9 condition met
+pod/recommendations-85568d78f9-g9z59 condition met
+pod/recommendations-85568d78f9-vmbt8 condition met
+{"degraded":true,"recommendations":["Stranger Things","The Crown","Narcos"],"service":"playback","status":"playing","title":"House of Cards","version":"v1"}
+
+===== scale recommendations back to 3 =====
+deployment.apps/recommendations scaled
+Waiting for deployment "recommendations" rollout to finish: 0 of 3 updated replicas are available...
+Waiting for deployment "recommendations" rollout to finish: 1 of 3 updated replicas are available...
+Waiting for deployment "recommendations" rollout to finish: 2 of 3 updated replicas are available...
+deployment "recommendations" successfully rolled out
+{"degraded":false,"recommendations":["The Night Agent","One Piece","Bridgerton","Wednesday"],"service":"playback","status":"playing","title":"House of Cards","version":"v1"}
+

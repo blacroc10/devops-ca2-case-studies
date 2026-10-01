@@ -1,0 +1,106 @@
+name: amazon-ci-cd
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "amazon/**"
+      - ".github/workflows/amazon-ci-cd.yml"
+  pull_request:
+    paths:
+      - "amazon/**"
+      - ".github/workflows/amazon-ci-cd.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [catalog, orders]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Lint and test
+        working-directory: amazon/services/${{ matrix.service }}
+        run: |
+          python -m pip install -r requirements.txt ruff pytest
+          ruff check .
+          pytest -q
+
+  build-push:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [catalog, orders]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v7
+        with:
+          context: amazon/services/${{ matrix.service }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/amazon-${{ matrix.service }}:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/amazon-${{ matrix.service }}:latest
+
+  deploy:
+    needs: build-push
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: helm/kind-action@v1
+        with:
+          cluster_name: amazon-ci
+          node_image: kindest/node:v1.37.0
+          kubectl_version: v1.37.1
+          wait: 120s
+      - name: Pull images and load them into kind
+        run: |
+          set -euo pipefail
+          owner="${{ github.repository_owner }}"
+          sha="${{ github.sha }}"
+          for svc in catalog orders; do
+            src="ghcr.io/${owner}/amazon-${svc}:${sha}"
+            docker pull "$src"
+            docker tag "$src" "amazon-${svc}:v1"
+            kind load docker-image "amazon-${svc}:v1" --name amazon-ci
+          done
+      - name: Apply manifests and smoke-test
+        run: |
+          set -euo pipefail
+          kubectl apply -f amazon/k8s/namespace.yaml
+          kubectl apply -f amazon/k8s/catalog.yaml
+          kubectl apply -f amazon/k8s/orders.yaml
+          kubectl -n amazon-demo rollout status deployment/catalog --timeout=180s
+          kubectl -n amazon-demo rollout status deployment/orders --timeout=180s
+          kubectl -n amazon-demo exec deploy/catalog -- python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=5)"
+          kubectl -n amazon-demo exec deploy/orders -- python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=5); urllib.request.urlopen('http://catalog-service.amazon-demo.svc.cluster.local:8080/health', timeout=5)"
+      - name: Roll back and fail the job
+        if: failure()
+        run: |
+          kubectl -n amazon-demo rollout undo deployment/catalog || true
+          kubectl -n amazon-demo rollout undo deployment/orders || true
+          kubectl -n amazon-demo get pods -o wide || true
+          exit 1

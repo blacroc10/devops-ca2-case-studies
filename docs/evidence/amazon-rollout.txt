@@ -1,0 +1,72 @@
+===== catalog pods before orders rollout =====
+NAME                      START                  RESTARTS
+catalog-66df8fb87-5l88d   2026-10-01T15:58:51Z   0
+catalog-66df8fb87-9jpw9   2026-10-01T15:58:51Z   0
+catalog-66df8fb87-s4z62   2026-10-01T15:58:51Z   0
+===== start traffic against orders =====
+pod/traffic created
+pod/traffic condition met
+===== roll orders v1 -> v2 =====
+deployment.apps/orders patched
+Waiting for deployment "orders" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "orders" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "orders" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "orders" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "orders" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "orders" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "orders" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "orders" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "orders" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "orders" rollout to finish: 1 old replicas are pending termination...
+deployment "orders" successfully rolled out
+deployment.apps/orders 
+REVISION  CHANGE-CAUSE
+1         <none>
+2         <none>
+
+===== catalog pods after orders rollout =====
+NAME                      START                  RESTARTS
+catalog-66df8fb87-5l88d   2026-10-01T15:58:51Z   0
+catalog-66df8fb87-9jpw9   2026-10-01T15:58:51Z   0
+catalog-66df8fb87-s4z62   2026-10-01T15:58:51Z   0
+===== orders version =====
+{"service":"orders","version":"v2"}
+
+===== traffic result =====
+ok=763 fail=0
+===== bad v3 (readiness fails) =====
+deployment.apps/orders env updated
+Waiting for deployment "orders" rollout to finish: 1 out of 3 new replicas have been updated...
+error: timed out waiting for the condition
+rollout_status_exit=1
+NAME                      READY   STATUS    RESTARTS   AGE   IP            NODE                NOMINATED NODE   READINESS GATES
+orders-5754f8b6b8-rfswc   0/1     Running   0          30s   10.244.0.15   ca2-control-plane   <none>           <none>
+orders-585f89fb69-bz6z9   1/1     Running   0          71s   10.244.0.12   ca2-control-plane   <none>           <none>
+orders-585f89fb69-gg79j   1/1     Running   0          64s   10.244.0.14   ca2-control-plane   <none>           <none>
+orders-585f89fb69-n7bf2   1/1     Running   0          67s   10.244.0.13   ca2-control-plane   <none>           <none>
+===== service still answers on the previous pods =====
+{"service":"orders","version":"v2"}
+
+===== rollback =====
+Warning: resource deployments/orders was previously managed with 'kubectl apply'. Rolling back will not update the kubectl.kubernetes.io/last-applied-configuration annotation, which may cause unexpected behavior on future 'kubectl apply' operations. Consider using 'kubectl apply' with your previous configuration file instead.
+deployment.apps/orders rolled back
+deployment "orders" successfully rolled out
+deployment.apps/orders 
+REVISION  CHANGE-CAUSE
+1         <none>
+3         <none>
+4         <none>
+
+{"service":"orders","version":"v2"}
+
+{"service":"orders","status":"ok"}
+
+NAME                      READY   STATUS        RESTARTS   AGE    IP            NODE                NOMINATED NODE   READINESS GATES
+catalog-66df8fb87-5l88d   1/1     Running       0          104s   10.244.0.5    ca2-control-plane   <none>           <none>
+catalog-66df8fb87-9jpw9   1/1     Running       0          104s   10.244.0.6    ca2-control-plane   <none>           <none>
+catalog-66df8fb87-s4z62   1/1     Running       0          104s   10.244.0.7    ca2-control-plane   <none>           <none>
+orders-5754f8b6b8-rfswc   0/1     Terminating   0          33s    10.244.0.15   ca2-control-plane   <none>           <none>
+orders-585f89fb69-bz6z9   1/1     Running       0          74s    10.244.0.12   ca2-control-plane   <none>           <none>
+orders-585f89fb69-gg79j   1/1     Running       0          67s    10.244.0.14   ca2-control-plane   <none>           <none>
+orders-585f89fb69-n7bf2   1/1     Running       0          70s    10.244.0.13   ca2-control-plane   <none>           <none>
+traffic                   0/1     Completed     0          75s    10.244.0.11   ca2-control-plane   <none>           <none>

@@ -1,0 +1,106 @@
+name: netflix-ci-cd
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "netflix/**"
+      - ".github/workflows/netflix-ci-cd.yml"
+  pull_request:
+    paths:
+      - "netflix/**"
+      - ".github/workflows/netflix-ci-cd.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [playback, recommendations]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Lint and test
+        working-directory: netflix/services/${{ matrix.service }}
+        run: |
+          python -m pip install -r requirements.txt ruff pytest
+          ruff check .
+          pytest -q
+
+  build-push:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [playback, recommendations]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v7
+        with:
+          context: netflix/services/${{ matrix.service }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/netflix-${{ matrix.service }}:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/netflix-${{ matrix.service }}:latest
+
+  deploy:
+    needs: build-push
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: helm/kind-action@v1
+        with:
+          cluster_name: netflix-ci
+          node_image: kindest/node:v1.37.0
+          kubectl_version: v1.37.1
+          wait: 120s
+      - name: Pull images and load them into kind
+        run: |
+          set -euo pipefail
+          owner="${{ github.repository_owner }}"
+          sha="${{ github.sha }}"
+          for svc in playback recommendations; do
+            src="ghcr.io/${owner}/netflix-${svc}:${sha}"
+            docker pull "$src"
+            docker tag "$src" "netflix-${svc}:v1"
+            kind load docker-image "netflix-${svc}:v1" --name netflix-ci
+          done
+      - name: Apply manifests and smoke-test
+        run: |
+          set -euo pipefail
+          kubectl apply -f netflix/k8s/namespace.yaml
+          kubectl apply -f netflix/k8s/playback.yaml
+          kubectl apply -f netflix/k8s/recommendations.yaml
+          kubectl -n netflix-demo rollout status deployment/playback --timeout=180s
+          kubectl -n netflix-demo rollout status deployment/recommendations --timeout=180s
+          kubectl -n netflix-demo exec deploy/playback -- python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=5)"
+          kubectl -n netflix-demo exec deploy/recommendations -- python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/recommendations', timeout=5)"
+      - name: Roll back and fail the job
+        if: failure()
+        run: |
+          kubectl -n netflix-demo rollout undo deployment/playback || true
+          kubectl -n netflix-demo rollout undo deployment/recommendations || true
+          kubectl -n netflix-demo get pods -o wide || true
+          exit 1

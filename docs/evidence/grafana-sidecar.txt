@@ -1,0 +1,24 @@
+{"time": "2026-10-01T16:10:10.542958+00:00", "level": "INFO", "msg": "Starting collector"}
+{"time": "2026-10-01T16:10:10.543782+00:00", "level": "INFO", "msg": "No folder annotation was provided, defaulting to k8s-sidecar-target-directory"}
+{"time": "2026-10-01T16:10:10.543922+00:00", "level": "INFO", "msg": "Loading incluster config..."}
+{"time": "2026-10-01T16:10:10.544122+00:00", "level": "INFO", "msg": "Starting health server on port 8080"}
+{"time": "2026-10-01T16:10:10.544904+00:00", "level": "INFO", "msg": "Unique filenames will not be enforced."}
+{"time": "2026-10-01T16:10:10.544974+00:00", "level": "INFO", "msg": "5xx response content will not be enabled."}
+{"time": "2026-10-01T16:10:10.545061+00:00", "level": "INFO", "msg": "Performing initial list-based sync before starting watch."}
+{"time": "2026-10-01T16:10:10.545108+00:00", "level": "INFO", "msg": "Loading incluster config..."}
+{"time": "2026-10-01T16:10:10.545425+00:00", "level": "INFO", "msg": "Performing list-based sync on secret resources: {}"}
+{"time": "2026-10-01T16:10:10.552576+00:00", "level": "INFO", "msg": "Loading incluster config..."}
+{"time": "2026-10-01T16:10:10.553070+00:00", "level": "INFO", "msg": "Performing list-based sync on configmap resources: {}"}
+{"time": "2026-10-01T16:10:10.558752+00:00", "level": "INFO", "msg": "Writing /tmp/dashboards/amazon-overview.json (ascii)"}
+{"time": "2026-10-01T16:10:10.559217+00:00", "level": "INFO", "msg": "Writing /tmp/dashboards/netflix-overview.json (ascii)"}
+{"time": "2026-10-01T16:10:10.561194+00:00", "level": "WARNING", "msg": "Retrying (Retry(total=4, connect=9, read=5, redirect=None, status=None)) after connection broken by 'NewConnectionError(\"HTTPConnection(host='localhost', port=3000): Failed to establish a new connection: [Errno 111] Connection refused\")': /api/admin/provisioning/dashboards/reload"}
+{"time": "2026-10-01T16:10:12.761718+00:00", "level": "WARNING", "msg": "Retrying (Retry(total=3, connect=8, read=5, redirect=None, status=None)) after connection broken by 'NewConnectionError(\"HTTPConnection(host='localhost', port=3000): Failed to establish a new connection: [Errno 111] Connection refused\")': /api/admin/provisioning/dashboards/reload"}
+{"time": "2026-10-01T16:10:17.162611+00:00", "level": "WARNING", "msg": "Retrying (Retry(total=2, connect=7, read=5, redirect=None, status=None)) after connection broken by 'NewConnectionError(\"HTTPConnection(host='localhost', port=3000): Failed to establish a new connection: [Errno 111] Connection refused\")': /api/admin/provisioning/dashboards/reload"}
+{"time": "2026-10-01T16:10:17.198991+00:00", "level": "INFO", "msg": "None sent to http://localhost:3000/api/admin/provisioning/dashboards/reload. Response: 200 OK {\"message\":\"Dashboards config reloaded\"}"}
+{"time": "2026-10-01T16:10:17.199178+00:00", "level": "INFO", "msg": "Initial sync complete, sidecar is ready."}
+{"time": "2026-10-01T16:10:17.199520+00:00", "level": "INFO", "msg": "Loading incluster config..."}
+{"time": "2026-10-01T16:10:17.199918+00:00", "level": "INFO", "msg": "Loading incluster config..."}
+{"time": "2026-10-01T16:10:17.200466+00:00", "level": "INFO", "msg": "Loading incluster config..."}
+{"time": "2026-10-01T16:10:17.201081+00:00", "level": "INFO", "msg": "Loading incluster config..."}
+{"time": "2026-10-01T16:11:17.204084+00:00", "level": "INFO", "msg": "Loading incluster config..."}
+{"time": "2026-10-01T16:11:17.204823+00:00", "level": "INFO", "msg": "Loading incluster config..."}

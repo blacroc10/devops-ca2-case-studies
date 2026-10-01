@@ -1,0 +1,41 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: catalog
+  namespace: amazon-demo
+  labels:
+    release: monitoring
+    app: catalog
+spec:
+  selector:
+    matchLabels:
+      app: catalog
+  namespaceSelector:
+    matchNames:
+      - amazon-demo
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      honorLabels: true
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: orders
+  namespace: amazon-demo
+  labels:
+    release: monitoring
+    app: orders
+spec:
+  selector:
+    matchLabels:
+      app: orders
+  namespaceSelector:
+    matchNames:
+      - amazon-demo
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      honorLabels: true

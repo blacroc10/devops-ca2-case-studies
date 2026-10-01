@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: playback
+  namespace: netflix-demo
+  labels:
+    app: playback
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: playback
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: playback
+        chaos: enabled
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        fsGroup: 10001
+      containers:
+        - name: playback
+          image: netflix-playback:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: APP_VERSION
+              value: v1
+            - name: RECOMMENDATIONS_URL
+              value: http://recommendations-service.netflix-demo.svc.cluster.local:8080/recommendations
+            - name: REC_TIMEOUT
+              value: "0.4"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 2
+            timeoutSeconds: 1
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "2"]
+          resources:
+            requests:
+              cpu: 20m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: playback-service
+  namespace: netflix-demo
+  labels:
+    app: playback
+spec:
+  selector:
+    app: playback
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

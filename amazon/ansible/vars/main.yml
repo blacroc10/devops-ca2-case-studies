@@ -1,0 +1,19 @@
+app_user: catalogsvc
+app_group: twopizza
+app_dir: /opt/amazon/catalog
+config_path: /etc/amazon/catalog/app.conf
+service_name: catalog
+app_version: v1
+log_level: info
+packages:
+  - curl
+  - ca-certificates
+directories:
+  - path: /opt/amazon/catalog
+    mode: "0755"
+  - path: /var/lib/amazon/catalog
+    mode: "0750"
+  - path: /var/log/amazon/catalog
+    mode: "0750"
+  - path: /etc/amazon/catalog
+    mode: "0755"

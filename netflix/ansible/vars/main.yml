@@ -1,0 +1,20 @@
+app_user: playbacksvc
+app_group: playback
+app_dir: /opt/netflix/playback
+config_path: /etc/netflix/playback/app.conf
+service_name: playback
+app_version: v1
+log_level: info
+rec_timeout: "0.4"
+packages:
+  - curl
+  - ca-certificates
+directories:
+  - path: /opt/netflix/playback
+    mode: "0755"
+  - path: /var/lib/netflix/playback
+    mode: "0750"
+  - path: /var/log/netflix/playback
+    mode: "0750"
+  - path: /etc/netflix/playback
+    mode: "0755"

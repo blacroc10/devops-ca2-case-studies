@@ -1,0 +1,41 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: playback
+  namespace: netflix-demo
+  labels:
+    release: monitoring
+    app: playback
+spec:
+  selector:
+    matchLabels:
+      app: playback
+  namespaceSelector:
+    matchNames:
+      - netflix-demo
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      honorLabels: true
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: recommendations
+  namespace: netflix-demo
+  labels:
+    release: monitoring
+    app: recommendations
+spec:
+  selector:
+    matchLabels:
+      app: recommendations
+  namespaceSelector:
+    matchNames:
+      - netflix-demo
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      honorLabels: true

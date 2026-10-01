@@ -1,0 +1,62 @@
+===== targets =====
+up catalog-service amazon-demo http://10.244.0.5:8080/metrics
+up catalog-service amazon-demo http://10.244.0.6:8080/metrics
+up catalog-service amazon-demo http://10.244.0.7:8080/metrics
+up orders-service amazon-demo http://10.244.0.12:8080/metrics
+up orders-service amazon-demo http://10.244.0.13:8080/metrics
+up orders-service amazon-demo http://10.244.0.14:8080/metrics
+up playback-service netflix-demo http://10.244.0.36:8080/metrics
+up playback-service netflix-demo http://10.244.0.34:8080/metrics
+up playback-service netflix-demo http://10.244.0.35:8080/metrics
+up recommendations-service netflix-demo http://10.244.0.30:8080/metrics
+up recommendations-service netflix-demo http://10.244.0.31:8080/metrics
+up recommendations-service netflix-demo http://10.244.0.32:8080/metrics
+===== queries =====
+-- up{namespace=~"amazon-demo|netflix-demo"}
+success
+{'metric': {'__name__': 'up', 'container': 'catalog', 'endpoint': 'http', 'instance': '10.244.0.7:8080', 'job': 'catalog-service', 'namespace': 'amazon-demo', 'pod': 'catalog-66df8fb87-s4z62', 'service': 'catalog-service'}, 'value': [1790871124.765, '1']}
+{'metric': {'__name__': 'up', 'container': 'recommendations', 'endpoint': 'http', 'instance': '10.244.0.32:8080', 'job': 'recommendations-service', 'namespace': 'netflix-demo', 'pod': 'recommendations-85568d78f9-mclq9', 'service': 'recommendations-service'}, 'value': [1790871124.765, '1']}
+{'metric': {'__name__': 'up', 'container': 'orders', 'endpoint': 'http', 'instance': '10.244.0.14:8080', 'job': 'orders-service', 'namespace': 'amazon-demo', 'pod': 'orders-585f89fb69-gg79j', 'service': 'orders-service'}, 'value': [1790871124.765, '1']}
+{'metric': {'__name__': 'up', 'container': 'recommendations', 'endpoint': 'http', 'instance': '10.244.0.31:8080', 'job': 'recommendations-service', 'namespace': 'netflix-demo', 'pod': 'recommendations-85568d78f9-vt9fv', 'service': 'recommendations-service'}, 'value': [1790871124.765, '1']}
+{'metric': {'__name__': 'up', 'container': 'playback', 'endpoint': 'http', 'instance': '10.244.0.35:8080', 'job': 'playback-service', 'namespace': 'netflix-demo', 'pod': 'playback-6bb5799b8-mk4s2', 'service': 'playback-service'}, 'value': [1790871124.765, '1']}
+{'metric': {'__name__': 'up', 'container': 'recommendations', 'endpoint': 'http', 'instance': '10.244.0.30:8080', 'job': 'recommendations-service', 'namespace': 'netflix-demo', 'pod': 'recommendations-85568d78f9-vnndb', 'service': 'recommendations-service'}, 'value': [1790871124.765, '1']}
+{'metric': {'__name__': 'up', 'container': 'catalog', 'endpoint': 'http', 'instance': '10.244.0.6:8080', 'job': 'catalog-service', 'namespace': 'amazon-demo', 'pod': 'catalog-66df8fb87-9jpw9', 'service': 'catalog-service'}, 'value': [1790871124.765, '1']}
+{'metric': {'__name__': 'up', 'container': 'catalog', 'endpoint': 'http', 'instance': '10.244.0.5:8080', 'job': 'catalog-service', 'namespace': 'amazon-demo', 'pod': 'catalog-66df8fb87-5l88d', 'service': 'catalog-service'}, 'value': [1790871124.765, '1']}
+{'metric': {'__name__': 'up', 'container': 'playback', 'endpoint': 'http', 'instance': '10.244.0.34:8080', 'job': 'playback-service', 'namespace': 'netflix-demo', 'pod': 'playback-6bb5799b8-t5tw7', 'service': 'playback-service'}, 'value': [1790871124.765, '1']}
+{'metric': {'__name__': 'up', 'container': 'playback', 'endpoint': 'http', 'instance': '10.244.0.36:8080', 'job': 'playback-service', 'namespace': 'netflix-demo', 'pod': 'playback-6bb5799b8-s97rz', 'service': 'playback-service'}, 'value': [1790871124.765, '1']}
+{'metric': {'__name__': 'up', 'container': 'orders', 'endpoint': 'http', 'instance': '10.244.0.13:8080', 'job': 'orders-service', 'namespace': 'amazon-demo', 'pod': 'orders-585f89fb69-n7bf2', 'service': 'orders-service'}, 'value': [1790871124.765, '1']}
+{'metric': {'__name__': 'up', 'container': 'orders', 'endpoint': 'http', 'instance': '10.244.0.12:8080', 'job': 'orders-service', 'namespace': 'amazon-demo', 'pod': 'orders-585f89fb69-bz6z9', 'service': 'orders-service'}, 'value': [1790871124.765, '1']}
+-- count by (service, status) (http_requests_total)
+success
+{'metric': {'service': 'catalog-service', 'status': '200'}, 'value': [1790871124.78, '5']}
+{'metric': {'service': 'recommendations-service', 'status': '200'}, 'value': [1790871124.78, '6']}
+{'metric': {'service': 'orders-service', 'status': '200'}, 'value': [1790871124.78, '6']}
+{'metric': {'service': 'playback-service', 'status': '200'}, 'value': [1790871124.78, '7']}
+{'metric': {'service': 'catalog-service', 'status': '500'}, 'value': [1790871124.78, '1']}
+{'metric': {'service': 'playback-service', 'status': '500'}, 'value': [1790871124.78, '1']}
+{'metric': {'service': 'orders-service', 'status': '500'}, 'value': [1790871124.78, '1']}
+-- sum by (service) (rate(http_requests_total{status=~"5.."}[5m]))
+success
+{'metric': {'service': 'catalog-service'}, 'value': [1790871124.793, '0.021240199528342656']}
+{'metric': {'service': 'playback-service'}, 'value': [1790871124.793, '0']}
+{'metric': {'service': 'orders-service'}, 'value': [1790871124.793, '0']}
+-- histogram_quantile(0.95, sum by (le, service) (rate(http_request_duration_seconds_bucket{service=~"catalog|orders|playback|recommendations"}[5m])))
+success
+-- sum by (namespace, deployment) (kube_deployment_status_replicas_available{namespace=~"amazon-demo|netflix-demo"})
+success
+{'metric': {'deployment': 'recommendations', 'namespace': 'netflix-demo'}, 'value': [1790871124.822, '3']}
+{'metric': {'deployment': 'orders', 'namespace': 'amazon-demo'}, 'value': [1790871124.822, '3']}
+{'metric': {'deployment': 'catalog', 'namespace': 'amazon-demo'}, 'value': [1790871124.822, '3']}
+{'metric': {'deployment': 'playback', 'namespace': 'netflix-demo'}, 'value': [1790871124.822, '3']}
+
+===== after honorLabels reload =====
+Thu Oct  1 12:15:17 EDT 2026
+status success
+{'service': 'orders', 'status': '200'} 6
+{'service': 'orders', 'status': '500'} 1
+{'service': 'catalog', 'status': '200'} 5
+{'service': 'recommendations', 'status': '200'} 6
+{'service': 'playback', 'status': '200'} 7
+{'service': 'catalog', 'status': '500'} 1
+{'service': 'playback', 'status': '500'} 1
+p95 [{'metric': {'service': 'catalog'}, 'value': [1790871318, '0.00475']}]

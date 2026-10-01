@@ -1,0 +1,49 @@
+===== recommendations pods before playback rollout =====
+NAME                               START                  RESTARTS
+recommendations-85568d78f9-mclq9   2026-10-01T16:05:16Z   0
+recommendations-85568d78f9-vnndb   2026-10-01T16:05:16Z   0
+recommendations-85568d78f9-vt9fv   2026-10-01T16:05:16Z   0
+pod/traffic created
+pod/traffic condition met
+===== roll playback v1 -> v2 =====
+deployment.apps/playback patched
+Waiting for deployment "playback" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "playback" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "playback" rollout to finish: 1 out of 3 new replicas have been updated...
+Waiting for deployment "playback" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "playback" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "playback" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "playback" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "playback" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "playback" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "playback" rollout to finish: 1 old replicas are pending termination...
+deployment "playback" successfully rolled out
+{"service":"playback","version":"v2"}
+
+===== recommendations pods after =====
+NAME                               START                  RESTARTS
+recommendations-85568d78f9-mclq9   2026-10-01T16:05:16Z   0
+recommendations-85568d78f9-vnndb   2026-10-01T16:05:16Z   0
+recommendations-85568d78f9-vt9fv   2026-10-01T16:05:16Z   0
+===== traffic =====
+ok=669 fail=0
+===== bad v3 =====
+deployment.apps/playback env updated
+Waiting for deployment "playback" rollout to finish: 1 out of 3 new replicas have been updated...
+error: timed out waiting for the condition
+rollout_status_exit=1
+NAME                        READY   STATUS    RESTARTS   AGE
+playback-5c66db4cd5-86754   0/1     Running   0          31s
+playback-6bb5799b8-mk4s2    1/1     Running   0          64s
+playback-6bb5799b8-s97rz    1/1     Running   0          60s
+playback-6bb5799b8-t5tw7    1/1     Running   0          67s
+{"service":"playback","version":"v2"}
+
+===== rollback =====
+Warning: resource deployments/playback was previously managed with 'kubectl apply'. Rolling back will not update the kubectl.kubernetes.io/last-applied-configuration annotation, which may cause unexpected behavior on future 'kubectl apply' operations. Consider using 'kubectl apply' with your previous configuration file instead.
+deployment.apps/playback rolled back
+deployment "playback" successfully rolled out
+{"service":"playback","version":"v2"}
+
+{"service":"playback","status":"ok"}
+

@@ -1,0 +1,17 @@
+=== VERIFY ===
+uid=999(playbacksvc) gid=1001(playback) groups=1001(playback)
+/etc/netflix/playback:
+total 4
+-rw-r----- 1 playbacksvc playback 145 Oct  1 16:03 app.conf
+
+/opt/netflix/playback:
+total 8
+-rw-r--r-- 1 playbacksvc playback 2840 Oct  1 16:03 app.py
+-rw-r--r-- 1 playbacksvc playback   56 Oct  1 16:03 requirements.txt
+---
+# Managed by Ansible. Do not edit on the host.
+service_name=playback
+app_version=v1
+log_level=info
+app_dir=/opt/netflix/playback
+rec_timeout=0.4
