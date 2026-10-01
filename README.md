@@ -122,7 +122,7 @@ COUNT=40 scripts/load.sh http://127.0.0.1:18080 /products
 
 ## GitHub Actions
 
-`.github/workflows/amazon-ci-cd.yml` and `netflix-ci-cd.yml`. Push to `main` runs test, pushes to GHCR, and deploys on a kind cluster in the runner. The action versions used are checkout v7, setup-python v7, setup-buildx v4, login v4, build-push v7, and kind-action v1, all on Node 24.
+`.github/workflows/amazon-ci-cd.yml` and `netflix-ci-cd.yml`. Push to `main` runs test, pushes to GHCR, and deploys on a kind cluster in the runner. A pull request runs the tests and the image build, and it does not push or deploy. The action versions used are checkout v7, setup-python v7, setup-buildx v4, login v4, build-push v7, and kind-action v1, all on Node 24.
 
 ## Docs
 
