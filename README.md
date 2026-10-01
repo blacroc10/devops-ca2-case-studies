@@ -1,5 +1,9 @@
 # DevOps CA-II: Amazon and Netflix case studies
 
+[![amazon-ci-cd](https://github.com/blacroc10/devops-ca2-case-studies/actions/workflows/amazon-ci-cd.yml/badge.svg)](https://github.com/blacroc10/devops-ca2-case-studies/actions/workflows/amazon-ci-cd.yml)
+[![netflix-ci-cd](https://github.com/blacroc10/devops-ca2-case-studies/actions/workflows/netflix-ci-cd.yml/badge.svg)](https://github.com/blacroc10/devops-ca2-case-studies/actions/workflows/netflix-ci-cd.yml)
+[![Pull requests](https://img.shields.io/github/issues-pr/blacroc10/devops-ca2-case-studies)](https://github.com/blacroc10/devops-ca2-case-studies/pulls)
+
 Shubhankar Sarangi, PRN 23070122206. Two case studies from the CA-II brief: Amazon (independent services) and Netflix (graceful degradation and chaos). The written answers are in `docs/answers/`.
 
 ## What is in the cluster
