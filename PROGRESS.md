@@ -35,5 +35,5 @@ RAM: 7.5 GiB. kube-prometheus-stack 91.8.2 is installed with alertmanager off, p
 
 ## Final
 
-- [ ] Push and confirm both Actions runs are green
-- [ ] STATUS.md with the repo URL
+- [x] Pushed. Both latest Actions runs are green (amazon `36890908602`, netflix `36890908595`)
+- [x] STATUS.md
