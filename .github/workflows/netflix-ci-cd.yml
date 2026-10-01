@@ -72,6 +72,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: helm/kind-action@v1
         with:
+          version: v0.33.0
           cluster_name: netflix-ci
           node_image: kindest/node:v1.37.0
           kubectl_version: v1.37.1

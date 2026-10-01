@@ -14,6 +14,12 @@ Only problems that actually happened in this run.
 - Cause: the `ansible.builtin.apt` module can install its Python helper on a normal run, but check mode refuses to do that.
 - Fix: installed `python3-apt` in the throwaway container, then reran `--check` and the two real applies. The WSL host was not the Ansible target.
 
+## kind-action's default kind could not init Kubernetes 1.37
+
+- Symptom: both deploy jobs failed at `kind create cluster` with `kubeadm.k8s.io/v1beta3` rejected. kubeadm said to use v1.36's migrate command. Test and image push had already succeeded.
+- Cause: `helm/kind-action@v1` ran kind v0.31.0, which writes a kubeadm config the 1.37 node image refuses. Local clusters used kind v0.33.0 and came up.
+- Fix: the workflow now passes `version: v0.33.0` into that action, the same kind release used locally.
+
 ## mermaid-cli could not write a PNG
 
 - Symptom: `npx @mermaid-js/mermaid-cli` reported that `docs/diagrams/pipeline.mmd` does not exist.
